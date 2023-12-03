@@ -1,9 +1,11 @@
 package principal_class;
 
 import enums.*;
-import properties.Rua;
+import properties.*;
 import Data.*;
 import java.util.*;
+
+import Controls.Main;
 
 public class Jogador {
 	private ArrayList<Propriedade> propriedades;
@@ -40,14 +42,15 @@ public class Jogador {
 	
 	@ Override
 	public String toString() {
-		String out = "Jogador: " + this.nome + "\n"
-					+ "Saldo: R$ " + this.saldo + "\n"
-					+ "Status: " + this.status + "\n"
-					+ "Posição: " + Propriedades.getPropriedade(this.posicao) + "\n";
+		String out = "JOGADOR: " + this.nome + "\n"
+					+ "SALDO: R$ " + Main.format(this.saldo) + "\n"
+					+ "STATUS: " + this.status + "\n"
+					+ "POSIÇÃO: " + Propriedades.getPropriedade(this.posicao).getLabel() + "\n";
 		
-		if(this.propriedades.size() != 0) {
-			out += "Sem propriedades";
+		if(this.propriedades.size() == 0) {
+			out += "SEM PROPRIEDADES\n";
 		} else {
+			out += "PROPRIEDADES:\n";
 			for(Propriedade p : this.propriedades) {
 				out += p.toString() + "\n";
 			}

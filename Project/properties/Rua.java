@@ -1,19 +1,21 @@
 package properties;
 
 import principal_class.*;
+import Controls.Main;
 import enums.*;
 
 public class Rua extends Propriedade implements PropriedadeAlocavel {
 	private StatusPropriedade status;
-	private String cor;
+	private corProp cor;
 	private double valorPropriedade;
 	private double valorImovel;
 	private double aluguelBase;
 	private Jogador proprietario;
 	private int quantImoveis;
 
-	public Rua(int id, String label, String cor, double valorPropriedade, double valorImovel, double aluguelBase) {
+	public Rua(int id, String label, corProp cor, double valorPropriedade, double valorImovel, double aluguelBase) {
 		super(id, label);
+		this.status = StatusPropriedade.LIVRE;
 		this.cor = cor;
 		this.valorPropriedade = valorPropriedade;
 		this.valorImovel = valorImovel;
@@ -40,10 +42,17 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 		// Calcula o valor do aluguel da rua passada de acordo com o id
 		return 0f;
 	}
-
+	
+	public String getPropriedade() {
+		return super.toString() + ": " + this.status + " - " + this.cor + "\n"
+				+ "VALOR DA PROPRIEDADE: R$ " + Main.format(this.valorPropriedade) + "\n"
+				+ "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase) + "\n"
+				+ "VALOR DO IMÓVEL: R$ " + Main.format(this.valorImovel);
+	}
+	
 	@Override
 	public String toString() {
-		return "";
+		return super.toString() + " - " + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase);
 	}
 
 	
@@ -52,7 +61,7 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 		return status;
 	}
 
-	public String getCor() {
+	public corProp getCor() {
 		return cor;
 	}
 
@@ -80,7 +89,7 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 		this.status = status;
 	}
 
-	public void setCor(String cor) {
+	public void setCor(corProp cor) {
 		this.cor = cor;
 	}
 

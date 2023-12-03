@@ -4,4 +4,5 @@ import principal_class.*;
 
 public interface PropriedadeAlocavel {
 	public void setProprietario(Jogador jogador);
+	public String getPropriedade();
 }

@@ -14,17 +14,20 @@ public class Tabuleiro {
 	
 	public void moverJogador(Jogador jogador, int d1, int d2) throws Exception{
 		// Pega o numero da jogada e move o jogador, verificando se ele está livre ou não
-		if(jogador.getStatus() != StatusJogador.LIVRE) {
+		if(jogador.getStatus() == StatusJogador.PRESO) {
 			Prisao.jogadaPresa(jogador, d1, d2);
 			
-			// Caso após fazer a jogada e os dados darem valores iguais, sai da prisão e se locomove
+			// Caso tenha feito uma jogada com os valores iguais ou pago a fiança, sai da prisão e se locomove
 			if(jogador.getStatus() == StatusJogador.LIVRE) {
-				jogador.setPosicao(jogador.getPosicao() + (d1 + d2));
+				jogador.setPosicao((jogador.getPosicao() + (d1 + d2)) % 40);
 			}
-
-			throw new Exception("Ops! Jogador não pode se mover no momento");
+			if(jogador.getStatus() == StatusJogador.PRESO) {
+				throw new Exception("Ops! Jogador não pode se mover no momento");
+			}
+		} else {
+			// Move o jogador, o mod 40 serve para nunca ultrapassar a posição com valor 40, que não possui no tabuleiro
+			jogador.setPosicao((jogador.getPosicao() + (d1 + d2)) % 40);
 		}
-		jogador.setPosicao(jogador.getPosicao() + (d1 + d2));
 	}
 	
 	public void prenderJogador(Jogador jogador) {

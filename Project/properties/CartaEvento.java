@@ -12,8 +12,8 @@ public class CartaEvento extends Propriedade{
 	}
 	
 	// Metodos da classe
-	public void executarCarta(Jogador jogador) {
-		// Puxa uma carta lá do banco de Cartas, executa sua função dependendo do tipo da carta
+	public static void executarCarta(Jogador jogador) {
+		// Puxa uma carta lá do banco de Cartas, e executa sua função dependendo do tipo da carta
 		Carta carta = Cartas.puxarCarta();
 		
 		System.out.println(carta);

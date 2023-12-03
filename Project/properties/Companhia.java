@@ -1,6 +1,7 @@
 package properties;
 
 import principal_class.*;
+import Controls.Main;
 import enums.*;
 
 public class Companhia extends Propriedade implements PropriedadeAlocavel{
@@ -11,6 +12,7 @@ public class Companhia extends Propriedade implements PropriedadeAlocavel{
 	
 	public Companhia(int id, String label, double valorCompanhia, double aluguelBase) {
 		super(id, label);
+		this.status = StatusPropriedade.LIVRE;
 		this.valorCompanhia = valorCompanhia;
 		this.aluguelBase = aluguelBase;
 		this.proprietario = null;
@@ -20,16 +22,18 @@ public class Companhia extends Propriedade implements PropriedadeAlocavel{
 		return q * aluguelBase;
 	}
 	
-	@ Override
-	public String toString() {
-		String out = super.toString() + "\n"
-				+ "Preço: R$ " + this.valorCompanhia + "\n"
-				+ "Aluguel base: R$ " + this.aluguelBase + "\n"
-				+ "Propretário: " + this.proprietario != null ? proprietario.getNome() : "Sem proprietario" + "\n";
+	public String getPropriedade() {
+		String out = super.toString() + " - " + this.status + "\n"
+				+ "VALOR DA COMPANHIA: R$ " + this.valorCompanhia + "\n"
+				+ "ALUGUEL BASE: R$ " + this.aluguelBase;
 		
 		return out;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " - " + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase);
+	}
 	
 	// Getters e Setters
 	public StatusPropriedade getStatus() {
