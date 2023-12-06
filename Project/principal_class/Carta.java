@@ -19,7 +19,8 @@ public class Carta {
 	
 	@ Override
 	public String toString() {
-		return " ??? CARTA | REVÉS ??? " + "\n" + this.label + "\n";
+		return " ??? CARTA | REVÉS ??? " + "\n"
+				+ "-> " + this.label + "\n";
 	}
 	
 	

@@ -2,11 +2,14 @@ package principal_class;
 
 import java.util.Scanner;
 
+import enums.ANSI;
 import enums.StatusJogador;
 
 public class Prisao {
 	public static void entrar(Jogador jogador) {
-		System.out.println("Você está preso - passe 3 rodadas na prisão ou pague a fiança");
+		System.out.println(ANSI.YELLOW + "+=================================================================+" + ANSI.RESET);
+		System.out.println(ANSI.LIGHTYELLOW + "|  Você está preso - passe 3 rodadas na prisão ou pague a fiança  |" + ANSI.RESET);
+		System.out.println(ANSI.YELLOW + "+=================================================================+" + ANSI.RESET);
 		jogador.setStatus(StatusJogador.PRESO);
 		jogador.setEstaLivre(3);
 	}

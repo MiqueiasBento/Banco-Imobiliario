@@ -24,15 +24,33 @@ public class Companhia extends Propriedade implements PropriedadeAlocavel{
 	
 	public String getPropriedade() {
 		String out = super.toString() + " - " + this.status + "\n"
-				+ "VALOR DA COMPANHIA: R$ " + this.valorCompanhia + "\n"
-				+ "ALUGUEL BASE: R$ " + this.aluguelBase;
+				+ "VALOR DA COMPANHIA: R$ " + Main.format(this.valorCompanhia) + "\n"
+				+ "ALUGUEL BASE: R$ " + Main.format(this.aluguelBase);
 		
 		return out;
 	}
-
+	
+	public String previaPropriedade() {
+		String out = String.format("%02d", super.getId()) + ": " + super.getLabel();
+		
+		if(this.getStatus() == StatusPropriedade.ALOCADA) {
+			out += " - ALUGUEL BASE: R$" + Main.format(this.getAluguelBase());
+		} else if(this.getStatus() == StatusPropriedade.LIVRE) {
+			out += " - VALOR DA PROPRIEDADE: R$ " + Main.format(this.getValorPropriedade());
+		}
+		
+		out += " - " + getStatus();
+		return out;
+	}
+	
 	@Override
 	public String toString() {
-		return super.toString() + " - " + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase);
+		String out = super.toString() + " - ";
+		
+		if(this.getStatus() == StatusPropriedade.HIPOTECADA)	out += this.getStatus();
+		else 			 out += "ALUGUEL BASE: R$ " + Main.format(this.getAluguelBase());
+		
+		return out;
 	}
 	
 	// Getters e Setters
@@ -40,7 +58,7 @@ public class Companhia extends Propriedade implements PropriedadeAlocavel{
 		return status;
 	}
 
-	public double getValorCompanhia() {
+	public double getValorPropriedade() {
 		return valorCompanhia;
 	}
 

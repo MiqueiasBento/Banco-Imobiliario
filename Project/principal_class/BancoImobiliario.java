@@ -1,63 +1,102 @@
 package principal_class;
 
 import Controls.Main;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 import properties.*;
 import Data.Propriedades;
+import enums.ANSI;
 import enums.StatusJogador;
 
 public class BancoImobiliario {
-	private ArrayList<Jogador> jogadores;
 	private Jogador winner;
 	private Tabuleiro board;
-
+	private int rDados;
+	
 	public BancoImobiliario() {
-		this.jogadores = new ArrayList<>();
 		this.winner = null;
 		this.board = new Tabuleiro();
-		
-		this.jogadores.add(new Jogador("Jane"));
-		this.jogadores.add(new Jogador("Maicon"));
+		this.rDados = 0;
 	}
 
 	// Executa as principais funções do jogo
-	public void jogar(Jogador j) {
-//				int d1 = jogada();
-//				int d2 = jogada();
-				int d1 = 5;
-				int d2 = 0;
-				
-				Main.write("Dados: " + d1 + " " + d2);
-				
-				try {
-					board.moverJogador(j, d1, d2);
-					verificarPosicao(j, (d1 + d2));
-				} catch (Exception e) {
-					Main.write(e.getMessage());
-				}
+	public void jogar(Jogador jogador) {
+		int d1 = jogada();
+		int d2 = jogada();
+//		int d1 = 3;
+//		int d2 = 3;
+		
+		mostrarDados(d1, d2);
+		
+		try {
+			board.moverJogador(jogador, d1, d2);
+			verificarPosicao(jogador, (d1 + d2));
+			verificarJogador(jogador);
+		} catch (Exception e) {
+			Main.write(e.getMessage());
+		}
 
 		// Se tiver um vencedor do jogo
-		if (winner != null) {
+		if (winner()) {
 			Main.write("Vencedor: \n" + winner);
 			return;
 		}
 	}
-
+	
+	// Executa as ações de administração, o negaciar e administrar (para comprar imóveis)
+	public void administracao(Jogador jogador, String acao) {
+		// Ficará em looping até realizar a acao, caso o player erre tentará novamente
+		while(true) {
+			// Tenta realizar a ação, se passar uma informação errada recebe exceção e tenta de novo
+			try {
+				if(acao.equals("HIPOTECAR")) {
+					board.hipotecar(jogador);
+					verificarJogador(jogador);
+					return;
+				}
+				else if(acao.equals("NEGOCIAR")) {
+					Main.write("\n===========================+");
+					Main.write("0 - CANCELAR               |");
+					Main.write("1 - VENDER                 |");
+					Main.write("2 - COMPRAR                |");
+					Main.write("===========================+");
+					Main.print("-> ");
+					int response = Main.sc.nextInt();
+					
+					if(response == 1) 		board.negociarVenda(jogador);
+					else if(response == 2)	board.negociarCompra(jogador);
+					else return;
+					
+					verificarJogador(jogador);
+					return;
+				}
+				else if(acao.equals("ADMINISTRAR")) {
+					board.comprarImoveis(jogador);
+					verificarJogador(jogador);
+					return;
+				}
+			} catch(Exception e) {
+				Main.write("\n" + ANSI.RED + e.getMessage() + ANSI.RESET + "\n");
+			}
+		}
+	}
+	
+	// Verfica se tem somente um player não falido, para assim a jogo acabar
 	public boolean winner() {
 		int playersLose = 0;
 		
 		// Conta players falidos, que já perderam o jogo
-		for (Jogador j : jogadores) {
+		for (Jogador j : board.getJogadores()) {
 			if (j.getStatus() == StatusJogador.FALIDO) {
 				playersLose++;
 			}
 		}
 		
 		// Se a quantidade de players falidos estiver faltando um para o total, entao temos um vencedor
-		if (playersLose == jogadores.size() - 1) {
-			for (Jogador j : jogadores) {
+		if (playersLose == board.getJogadores().size() - 1) {
+			for (Jogador j : board.getJogadores()) {
 				if (j.getStatus() != StatusJogador.FALIDO) {
 					winner = j;
 					Main.write(j.getNome().toUpperCase() + " VENCEU !!!!!!!!");
@@ -67,14 +106,6 @@ public class BancoImobiliario {
 		}
 		
 		return false;
-	}
-
-	public double hipotecar(Propriedade propriedade) {
-		return 0;
-	}
-
-	public void pagarConta(Jogador jogador) {
-
 	}
 	
 	// Irá fazer toda uma verificação da atual posição do player, se o local já está alocado, se precisa pagar aluguel e etc
@@ -87,6 +118,7 @@ public class BancoImobiliario {
 
 			if (r.getProprietario() == null) {
 				// Se estiver sem proprietario, pode ser comprada pelo jogador que está na posicao
+				Main.write("Saldo: R$ " + Main.format(jogador.getSaldo()));
 				Main.write(r.getPropriedade());
 				Main.print("\nDeseja comprar? (sim / nao) ");
 				String response = Main.input();
@@ -95,16 +127,12 @@ public class BancoImobiliario {
 					if(jogador.getSaldo() - r.getValorPropriedade() < 0) throw new Exception("Saldo insuficiente");
 					
 					jogador.comprarPropriedade(r);
-					jogador.setSaldo(jogador.getSaldo() - r.getValorPropriedade());
 				} else {
 					return;
 				}
 			} else {
-				// Paga o valor do aluguel da propriedade, independente se tem saldo ou nao
-				Main.write("Aluguel da propriedade: R$ " + Main.format(r.valorAluguel()));
-				
-				jogador.setSaldo(jogador.getSaldo() - r.valorAluguel());	// Saldo descontado no saldo do jogador da vez
-				r.getProprietario().setSaldo(r.getProprietario().getSaldo() + r.valorAluguel());	// Saldo acrescentado ao proprietário
+				// Chama metodo para pagar aluguel
+				board.pagarAluguel(jogador, r, n);
 			}
 		} else if(Propriedades.getPropriedade(id) instanceof CartaEvento) {
 			// Se estiver na posicao de uma Carta/Reves, puxa a carta e a executa
@@ -117,26 +145,23 @@ public class BancoImobiliario {
 
 			if (c.getProprietario() == null) {
 				// Se estiver sem proprietario, pode ser comprada pelo jogador que está na posicao
+				Main.write("Saldo: R$ " + Main.format(jogador.getSaldo()));
 				Main.write(c.getPropriedade());
 				Main.print("\nDeseja comprar? (sim / nao) ");
 
 				String response = Main.input();
 				if (response.equals("sim")) {
 					if (response.equals("sim")) {
-						if(jogador.getSaldo() - c.getValorCompanhia() < 0) throw new Exception("Saldo insuficiente");
+						if(jogador.getSaldo() - c.getValorPropriedade() < 0) throw new Exception("Saldo insuficiente");
 						
 						jogador.comprarPropriedade(c);
-						jogador.setSaldo(jogador.getSaldo() - c.getValorCompanhia());
 					}
 				} else {
 					return;
 				}
 			} else {
-				// Paga o valor do aluguel da propriedade, independente se tem saldo ou nao
-				Main.write("Aluguel da propriedade: R$ " + Main.format(c.valorAluguel(n)));
-				
-				jogador.setSaldo(jogador.getSaldo() - c.valorAluguel(n));	// Saldo descontado no saldo do jogador da vez
-				c.getProprietario().setSaldo(c.getProprietario().getSaldo() + c.valorAluguel(n));	// Saldo acrescentado ao proprietário
+				// Chama metodo para pagar aluguel
+				board.pagarAluguel(jogador, c, n);
 			}
 		} else if (Propriedades.getPropriedade(id) instanceof Propriedade) {
 			// Para as demais propriedades, como: Início, Prisão, Detenção e Férias, Receita Federal e Loteria.
@@ -167,38 +192,79 @@ public class BancoImobiliario {
 		}
 	}
 	
+	// Retorna os jogadores nao falidos
+	public ArrayList<Jogador> jogAtivos(){
+		ArrayList<Jogador> list = new ArrayList<>();
+		
+		for(Jogador j : board.getJogadores()) {
+			if(j.getStatus() != StatusJogador.FALIDO) {
+				list.add(j);
+			}
+		}
+		return list;
+	}
+	
+	// Para verificar se o jogador está com saldo negativo e não permití-lo continuar enquanto isso
+	public void verificarJogador(Jogador jogador) {
+		// Se a repetição de dados for igual a 3, vai para a prisao
+		if(rDados == 3) {
+			Prisao.entrar(jogador);
+			rDados = 0;
+		}
+		
+		if(jogador.getSaldo() >= 0) {
+			return;
+		}
+		
+		Main.write(ANSI.RED + "\n- - - SEU SALDO ESTÁ NEGATIVO - - -" + ANSI.RESET);
+		while(jogador.getSaldo() < 0) {
+			Main.write("==================================+");
+			Main.write("1 - NEGOCIAR                      |");
+			Main.write("2 - HIPOTECAR                     |");
+			Main.write("3 - DESISTIR                      |");
+			Main.write("==================================+");
+			Main.print("-> ");
+			String response = Main.sc.nextLine();
+			
+			if(response.contains("1")) {
+				this.administracao(jogador, "NEGOCIAR");
+			} else if(response.contains("2")) {
+				this.administracao(jogador, "HIPOTECAR");
+			} else if(response.contains("3")) {
+				board.desistir(jogador);
+				return;
+			}
+		}
+		
+	}
+	
 	// Sorteio um dado de seis faces (1 a 6)
 	public int jogada() {
 		Random r = new Random();
 		return r.nextInt(6) + 1;
 	}
 	
-	// Adicionar jogadores, tendo que ser no minimo 2 e no maximo 6
-	public void addJogadores() {
-		for(int i = 0; i < 3; i++) {
-			System.out.print("Jogador " + (i+1) + ": ");
-			String in = Main.sc.nextLine();
-			jogadores.add(new Jogador(in));
-		}
+	public void mostrarDados(int valor1, int valor2) {
+        System.out.println(ANSI.YELLOW + "+-----+   +-----+");
+        for (int i = 1; i <= 3; i++) {
+            if (i == 2) {
+                System.out.println(ANSI.YELLOW + "|  " + ANSI.LIGHTYELLOW + valor1 + ANSI.YELLOW + "  |   |  " + ANSI.LIGHTYELLOW + valor2 + ANSI.YELLOW + "  |");
+            } else {
+                System.out.println(ANSI.YELLOW + "|     |   |     |" + ANSI.RESET);
+            }
+        }
+        System.out.println(ANSI.YELLOW + "+-----+   +-----+" + ANSI.RESET);
+        
+        if(valor1 == valor2)	rDados++;
+        else 					rDados = 0;
+	}        
+
+	public boolean repete() {
+		if(rDados > 0) 	return true;
+		else 			return false;
 	}
 	
-	// Retorna todos os jogadores da partida
-	public ArrayList<Jogador> getJogadores(){
-		return jogadores;
-	}
-	
-	public boolean isWinner() {
-		if(winner == null) return false;
-		else return true;
-	}
-	
-	@ Override
-	public String toString() {
-		String out = "\n";
-		for(Jogador j : jogadores) {
-			out += j.toString() + "\n";
-		}
-		
-		return out;
+	public void chamaAddPlayers() {
+		board.addJogadores();
 	}
 }

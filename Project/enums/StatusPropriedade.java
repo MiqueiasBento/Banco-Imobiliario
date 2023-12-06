@@ -7,11 +7,11 @@ public enum StatusPropriedade {
 	public String toString() {
 		switch (this) {
 		case LIVRE:
-			return "Livre";
+			return "LIVRE";
 		case HIPOTECADA:
-			return "Hipotecada";
+			return "HIPOTECADA";
 		case ALOCADA:
-			return "Alocada";
+			return "ALOCADA";
 		default:
 			return "Sem status";
 		}

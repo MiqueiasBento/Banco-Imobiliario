@@ -22,41 +22,52 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 		this.aluguelBase = aluguelBase;
 	}
 
-
 	// Metodos da classe
 	public void setProprietario(Jogador proprietario) {
 		this.proprietario = proprietario;
 	}
-	
+
 	public double valorAluguel() {
 		return this.aluguelBase * Math.pow(2, this.quantImoveis);
 	}
 
-	public void comprarImovel(Jogador proprieatario) {
-		// Compra a propriedade, diminui o valor do saldo do jogador e coloca o
-		// proprietário da rua
-		// como o jogador passado como parâmetro
+	public String getPropriedade() {
+		return super.toString() + ": " + this.cor + " - " + this.status + "\n" + "VALOR DA PROPRIEDADE: R$ "
+				+ Main.format(this.valorPropriedade) + "\n" + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase)
+				+ "\n" + "VALOR DO IMÓVEL: R$ " + Main.format(this.valorImovel);
 	}
 
-	public double aluguelRua(int id) {
-		// Calcula o valor do aluguel da rua passada de acordo com o id
-		return 0f;
+	public String previaPropriedade() {
+		String out = String.format("%02d", super.getId()) + ": " + super.getLabel();
+
+		if (this.getStatus() == StatusPropriedade.LIVRE) {
+			out += " - VALOR DO ALUGUEL: R$" + Main.format(this.valorAluguel());
+		} else if (this.getStatus() == StatusPropriedade.ALOCADA) {
+			out += " - VALOR DA PROPRIEDADE: R$" + Main.format(this.getValorPropriedade());
+		}
+
+		out += " - " + getStatus();
+		return out;
 	}
-	
-	public String getPropriedade() {
-		return super.toString() + ": " + this.status + " - " + this.cor + "\n"
-				+ "VALOR DA PROPRIEDADE: R$ " + Main.format(this.valorPropriedade) + "\n"
-				+ "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase) + "\n"
-				+ "VALOR DO IMÓVEL: R$ " + Main.format(this.valorImovel);
-	}
-	
+
 	@Override
 	public String toString() {
-		return super.toString() + " - " + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase);
+		String out = super.toString() + " - ";
+
+		if (this.getStatus() == StatusPropriedade.HIPOTECADA)
+			out += this.getStatus();
+		else
+			out += "VALOR ALUGUEL: R$ " + Main.format(this.valorAluguel());
+
+		return out;
 	}
 
-	
 	// Getters e Setters
+	public boolean isAlocada() {
+		if(this.getStatus() == StatusPropriedade.ALOCADA) 	return true;
+		else 												return false;
+	}
+	
 	public StatusPropriedade getStatus() {
 		return status;
 	}
@@ -80,7 +91,7 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 	public Jogador getProprietario() {
 		return proprietario;
 	}
-	
+
 	public int getQuantImoveis() {
 		return this.quantImoveis;
 	}

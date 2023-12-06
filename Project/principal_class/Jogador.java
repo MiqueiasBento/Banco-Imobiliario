@@ -1,14 +1,14 @@
 package principal_class;
 
 import enums.*;
-import properties.*;
+import properties.Rua;
 import Data.*;
-import java.util.*;
 
+import java.util.ArrayList;
 import Controls.Main;
 
 public class Jogador {
-	private ArrayList<Propriedade> propriedades;
+	private ArrayList<PropriedadeAlocavel> propriedades;
 	private String nome;
 	private int estaLivre;
 	private double saldo;
@@ -25,91 +25,108 @@ public class Jogador {
 		this.status = StatusJogador.LIVRE;
 	}
 
-	public void irPrisao() throws Exception{
-		this.setEstaLivre(3);
-		this.setStatus(StatusJogador.PRESO);
-	}
-
-	public void sairPrisao() {
-		this.setEstaLivre(0);
-		this.setStatus(StatusJogador.PRESO);
-	}
-	
-	public void pagarDivida(double valor, Jogador jogador) {
-		jogador.setSaldo(valor + jogador.getSaldo());
-		setSaldo(getSaldo() - valor);
-	}
-	
-	@ Override
+	@Override
 	public String toString() {
-		String out = "JOGADOR: " + this.nome + "\n"
-					+ "SALDO: R$ " + Main.format(this.saldo) + "\n"
-					+ "STATUS: " + this.status + "\n"
-					+ "POSIÇÃO: " + Propriedades.getPropriedade(this.posicao).getLabel() + "\n";
-		
-		if(this.propriedades.size() == 0) {
-			out += "SEM PROPRIEDADES\n";
+		String out = "JOGADOR: " + this.nome + "\n" + "SALDO: R$ " + Main.format(this.saldo) + "\n" + "STATUS: "
+				+ this.status + "\n" + "POSIÇÃO: " + Propriedades.getPropriedade(this.posicao).getLabel() + "\n";
+
+		if (this.propriedades.size() == 0) {
+			out += ANSI.ITALIC + "SEM PROPRIEDADES\n" + ANSI.RESET;
 		} else {
 			out += "PROPRIEDADES:\n";
-			for(Propriedade p : this.propriedades) {
+			for (PropriedadeAlocavel p : this.propriedades) {
 				out += p.toString() + "\n";
 			}
 		}
-		
+
 		return out;
 	}
-	
-	
-	// Metodos da classe
-	public void pagarDivida(Jogador receptor, double value) {
-		setSaldo(getSaldo() - value);
-		receptor.setSaldo(getSaldo() + value);
-	}
-	
-	public void comprarPropriedade(PropriedadeAlocavel propriedade) {
-		propriedades.add((Propriedade) propriedade);
-		propriedade.setProprietario(this);
-	}
 
-	public void pagarAluguel(Jogador jogador, double value) {
-		// Recebe o jogador que receberá o pagamento e o valor a ser pago pelo aluguel
-		jogador.setSaldo(jogador.getSaldo() + value);
-		setSaldo(getSaldo() - value);
-	}
-	
-	// Adiciona um novo imóvel a propriedade (que só pode ser uma rua), isso aumenta o valor do aluguel
-	public void construirCasa(Rua rua) throws Exception{
-		// Se o saldo não for suficiente não pode comprar
-		if(this.getSaldo() - rua.getValorImovel() < 0) {
-			throw new Exception("Ops! Saldo insuficiente para a compra imóvel");
+	// Adiciona novos imóveis a propriedade (que só pode ser do tipo Rua), isso aumenta o valor do aluguel
+	public void construirCasa(Rua rua, int quant) throws Exception {
+		// Se já tiver construido um hotel, a funcao para aqui
+		if (rua.getQuantImoveis() > 4) {
+			throw new Exception("Ops! hotel já construido");
 		}
 		
-		// Recebe a propriedadee adiciona um imovel, o valor do imovel é retirado do jogador
-		if(rua.getQuantImoveis() == 4) {
+		// Se o saldo não for suficiente não pode comprar
+		if (this.getSaldo() - (rua.getValorImovel() * quant) < 0) {
+			throw new Exception("Ops! Saldo insuficiente para a compra do imóvel");
+		}
+		
+		// Recebe a propriedade adiciona um imovel, o valor do imovel é retirado do jogador
+		if (rua.getQuantImoveis() == 4) {
 			construirHotel(rua);
 		} else {
-			setSaldo(getSaldo() - rua.getValorImovel());
+			if (rua.getQuantImoveis() + quant > 4) {
+				quant = 4 - rua.getQuantImoveis();
+			}
+			this.setSaldo(this.getSaldo() - (rua.getValorImovel() * quant));
+			rua.setQuantImoveis(rua.getQuantImoveis() + quant);
 		}
-		
-		rua.setQuantImoveis(rua.getQuantImoveis() + 1);
-		
-		
 	}
-	
+
 	// Construir hotel, é 5x mais que o imóvel comum
-	public void construirHotel(Rua rua) throws Exception{
-		if(this.getSaldo() - (rua.getValorImovel() * 5) < 0) {
-			throw new Exception("Ops! Saldo insuficiente para a comprar hotel");
+	public void construirHotel(Rua rua) throws Exception {
+		if (rua.getQuantImoveis() == 6) {
+			throw new Exception("Ops! Hotel já construído");
 		}
-		
-		rua.setQuantImoveis(rua.getQuantImoveis() + 4);
-		setSaldo(getSaldo() - (rua.getValorImovel() * 5));
+		if (this.getSaldo() - (rua.getValorImovel() * 5) < 0) {
+			throw new Exception("Ops! Saldo insuficiente para a comprar do hotel");
+		}
+
+		rua.setQuantImoveis(rua.getQuantImoveis() + 2);
+		this.setSaldo(this.getSaldo() - (rua.getValorImovel() * 5));
+	}
+
+	// Metodos da classe
+	public void comprarPropriedade(PropriedadeAlocavel propriedade) {
+		addPropriedade(propriedade);
+		propriedade.setProprietario(this);
+		propriedade.setStatus(StatusPropriedade.ALOCADA);
+
+		this.setSaldo(this.getSaldo() - propriedade.getValorPropriedade());
+	}
+
+	// Verifica se possue certa propriedade e a retorna
+	public PropriedadeAlocavel getPropriedade(int id) {
+		for (PropriedadeAlocavel p : propriedades) {
+			Propriedade prop = (Propriedade) p;
+			if (prop.getId() == id) {
+				return p;
+			}
+		}
+		return null;
 	}
 	
-	
+	public ArrayList<PropriedadeAlocavel> getPropriedade(){
+		return this.propriedades;
+	}
+
 	// Getters e Setters
-	public ArrayList<Propriedade> getPropriedades() {
-		return propriedades;
+	public void getPropriedades() {
+		for (PropriedadeAlocavel p : propriedades) {
+			Main.write(p.previaPropriedade());
+		}
+	}
+	
+	public int quantPropriedade() {
+		return this.propriedades.size();
+	}
+
+	public void addPropriedade(PropriedadeAlocavel p) {
+		this.propriedades.add(p);
+	}
+
+	public void rmPropriedade(PropriedadeAlocavel p) {
+		int i = 0;
+		for (PropriedadeAlocavel prop : propriedades) {
+			if (p == prop) {
+				propriedades.remove(i);
+				break;
+			}
+			i++;
+		}
 	}
 
 	public int isEstaLivre() {
@@ -127,16 +144,16 @@ public class Jogador {
 	public StatusJogador getStatus() {
 		return status;
 	}
-	
+
 	public String getNome() {
 		return nome;
 	}
-	
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
-	public void setPropriedades(ArrayList<Propriedade> propriedades) {
+
+	public void setPropriedades(ArrayList<PropriedadeAlocavel> propriedades) {
 		this.propriedades = propriedades;
 	}
 

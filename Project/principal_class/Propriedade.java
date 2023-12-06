@@ -19,6 +19,6 @@ public class Propriedade {
 	
 	@ Override
 	public String toString() {
-		return this.id + ": " + this.label;
+		return String.format("%02d", this.id) + ": " + this.label;
 	}
 }
