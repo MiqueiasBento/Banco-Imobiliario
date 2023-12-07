@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import Controls.Main;
 
 public class Jogador {
+//	public static final long serialVersionUID = 1L;
+	
 	private ArrayList<PropriedadeAlocavel> propriedades;
 	private String nome;
 	private int estaLivre;
@@ -27,17 +29,19 @@ public class Jogador {
 
 	@Override
 	public String toString() {
-		String out = "JOGADOR: " + this.nome + "\n" + "SALDO: R$ " + Main.format(this.saldo) + "\n" + "STATUS: "
+		String out = "\n+--------------- STATUS ----------------+\n";
+		out += "JOGADOR: " + this.nome + "\n" + "SALDO: R$ " + Main.format(this.saldo) + "\n" + "STATUS: "
 				+ this.status + "\n" + "POSIÇÃO: " + Propriedades.getPropriedade(this.posicao).getLabel() + "\n";
 
 		if (this.propriedades.size() == 0) {
-			out += ANSI.ITALIC + "SEM PROPRIEDADES\n" + ANSI.RESET;
+			out += ANSI.ITALIC + "SEM PROPRIEDADES" + ANSI.RESET;
 		} else {
 			out += "PROPRIEDADES:\n";
 			for (PropriedadeAlocavel p : this.propriedades) {
-				out += p.toString() + "\n";
+				out += p.toString();
 			}
 		}
+		out += "\n+---------------------------------------+";
 
 		return out;
 	}

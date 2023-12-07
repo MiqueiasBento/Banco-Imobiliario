@@ -2,6 +2,7 @@ package principal_class;
 import enums.TipoCarta;
 
 public class Carta {
+//	public static final long serialVersionUID = 1L;
 	private int id;
 	private String label;
 	private TipoCarta tipo;

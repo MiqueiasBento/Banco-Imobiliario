@@ -10,7 +10,8 @@ import properties.*;
 
 import java.util.ArrayList;
 
-public class Tabuleiro {
+public class Tabuleiro{
+//	public static final long serialVersionUID = 1L;
 	private ArrayList<Jogador> jogadores;
 	
 	public Tabuleiro(){
@@ -21,29 +22,29 @@ public class Tabuleiro {
 	}
 	
 	public void moverJogador(Jogador jogador, int d1, int d2) throws Exception {
-		// Pega o numero da jogada e move o jogador, verificando se ele está livre ou
-		// não
+		// Pega o numero da jogada e move o jogador, verificando se ele está livre ou não
 		if (jogador.getStatus() == StatusJogador.PRESO) {
 			Prisao.jogadaPresa(jogador, d1, d2);
 
-			// Caso tenha feito uma jogada com os valores iguais ou pago a fiança, sai da
-			// prisão e se locomove
+			// Caso tenha feito uma jogada com os valores iguais ou pago a fiança, sai da prisão e se locomove
 			if (jogador.getStatus() == StatusJogador.LIVRE) {
-				// Se o player estiver antes da posição Inicio, e na jogada cair em cima ou
-				// depois, ganhará mais 200k
+				// Se o player estiver antes da posição Inicio, e na jogada cair em cima ou depois, ganhará mais 200k
+				mostrarPosicao(jogador, (d1+d2));
 				passarInicio(jogador, (d1 + d2));
 				jogador.setPosicao((jogador.getPosicao() + (d1 + d2)) % 40);
 			}
 			if (jogador.getStatus() == StatusJogador.PRESO) {
-				throw new Exception("Ops! Jogador não pode se mover no momento");
+				throw new Exception(ANSI.BOLD + "Ops! Jogador não pode se mover no momento" + ANSI.RESET);
 			}
 		} else {
 			// Move o jogador, o mod 40 serve para nunca ultrapassar a posição com valor 40,
 			// que não possui no tabuleiro
 			// Se o player estiver antes da posição Inicio, e na jogada cair em cima ou
 			// depois, ganhará mais 200k
-			passarInicio(jogador, (d1 + d2));
+			
+			mostrarPosicao(jogador, (d1+d2));
 			jogador.setPosicao((jogador.getPosicao() + (d1 + d2)) % 40);
+			passarInicio(jogador, (d1 + d2));
 		}
 	}
 
@@ -59,15 +60,17 @@ public class Tabuleiro {
 			return;
 		}
 
-		Main.write("-- DIGITE 0 PARA CANCELAR --");
+		Main.write("+-------------------- DIGITE 0 PARA CANCELAR --------------------+");
 		jogador.getPropriedades();
 
-		Main.print(ANSI.LIGHTWHITE + "- ID DA PROPRIEDADE: " + ANSI.RESET);
+		Main.print(ANSI.BOLD + "\n- ID DA PROPRIEDADE: " + ANSI.RESET);
 		int id = Main.sc.nextInt();
 
 		if (id == 0) {
 			Main.write("");
-			Main.write(ANSI.YELLOW + "OPERAÇÃO CANCELADA" + ANSI.RESET);
+			Main.write(ANSI.YELLOW + "           OPERAÇÃO CANCELADA" + ANSI.RESET);
+			Main.write("+----------------------------------------------------------------+");
+			Main.sc.nextLine();
 			return;
 		}
 
@@ -83,25 +86,28 @@ public class Tabuleiro {
 			Main.write("2 - NAO");
 			Main.print("-> ");
 			int response = Main.sc.nextInt();
+			Main.sc.nextLine();
 			
 			if(response == 2) {
 				return;
 			} else {
 				if(jogador.getSaldo() - (pa.getValorPropriedade() / 2) < 0) {
-					throw new Exception("OPS! SALDO INSUFICIENTE PARA DESIPOTECAR PROPRIEDADE");
+					throw new Exception("OPS! SALDO INSUFICIENTE PARA DESIPOTECAR A PROPRIEDADE");
 				}
 				
 				pa.setStatus(StatusPropriedade.ALOCADA);
 				jogador.setSaldo(jogador.getSaldo() - (pa.getValorPropriedade() / 2));
 				
-				Main.write(ANSI.LIGHTGREEN + "\n* * * DESIPOTECADA * * *" + ANSI.RESET);
+				Main.write(ANSI.LIGHTGREEN + "\n         * * * DESIPOTECADA * * *         " + ANSI.RESET);
+				Main.write("+----------------------------------------------------------------+");
 			}
 		} else {
-			Main.write("DESEJA DESIPOTECAR?");
+			Main.write("DESEJA HIPOTECAR?");
 			Main.write("1 - SIM");
 			Main.write("2 - NAO");
 			Main.print("-> ");
 			int response = Main.sc.nextInt();
+			Main.sc.nextLine();
 			
 			if(response == 2) {
 				return;
@@ -137,7 +143,7 @@ public class Tabuleiro {
 		}
 		Main.write("+=============================================================+");
 		
-		Main.write("");
+		Main.write(ANSI.BOLD + "+----------------------------------------------------------------+" + ANSI.RESET);
 		Main.print(ANSI.LIGHTWHITE + "- ID DA PROPRIEDADE: " + ANSI.RESET);
 		int id = Main.sc.nextInt();
 
@@ -162,14 +168,16 @@ public class Tabuleiro {
 			double value = Main.sc.nextDouble();
 
 			Main.sc.nextLine();
-			Main.print("- " + ANSI.GREEN + proprietario.getNome() + ANSI.RESET + ", aceita a proposta? (sim / nao) ");
+			Main.print("- " + ANSI.GREEN + proprietario.getNome() + ANSI.RESET + ", aceita a proposta? (Y / n) ");
 			String response = Main.sc.nextLine();
 
-			if (response.equals("nao")) {
-				Main.write(ANSI.RED + "\n - - - NEGOCIAÇÃO RECUSADA! - - -" + ANSI.RESET);
+			if (response.contains("n") || response.contains("N")) {
+				Main.write(ANSI.RED + "\n             - - - NEGOCIAÇÃO RECUSADA! - - -" + ANSI.RESET);
+				Main.write(ANSI.BOLD + "+----------------------------------------------------------------+" + ANSI.RESET);
 				return;
 			} else {
-				Main.write(ANSI.LIGHTBLUE + "\n + + + NEGOCIAÇÃO ACEITA! + + + " + ANSI.RESET);
+				Main.write(ANSI.LIGHTBLUE + "\n       + + + NEGOCIAÇÃO ACEITA! + + +" + ANSI.RESET);
+				Main.write(ANSI.BOLD + "+----------------------------------------------------------------+" + ANSI.RESET);
 				proprietario.rmPropriedade(pn);
 				proprietario.setSaldo(proprietario.getSaldo() + value);
 
@@ -229,10 +237,10 @@ public class Tabuleiro {
 		double value = Main.sc.nextDouble();
 		Main.sc.nextLine();		// Limpar o buffer
 		
-		Main.print("\n-> " + ANSI.GREEN + jogadores.get(idx).getNome() + ANSI.RESET + ", ACEITA A PROPOSTA? (sim / nao) ");
+		Main.print("\n-> " + ANSI.GREEN + jogadores.get(idx).getNome() + ANSI.RESET + ", ACEITA A PROPOSTA? (Y / n) ");
 		String response = Main.sc.nextLine();
 		
-		if (response.equals("nao")) {
+		if (response.contains("n") || response.contains("N")) {
 			Main.write(ANSI.RED + "\n - - - NEGOCIAÇÃO RECUSADA! - - -" + ANSI.RESET);
 			return;
 		} else {
@@ -377,19 +385,40 @@ public class Tabuleiro {
 				Main.write(ANSI.LIGHTYELLOW + "+=====   ADICIONE MAIS JOGADORES   =====+" + ANSI.RESET);
 				i--;
 			} else if(in.contains("ok")  && jogadores.size() >= 2) {
-				Main.write(ANSI.LIGHTYELLOW + "+=======================================+" + ANSI.RESET);
-				return;
+				break;
 			}
 			
-			if(!in.contains("ok"))
+			boolean exist = false;
+			for(Jogador j : jogadores) {
+				if(j.getNome().equals(in)) {
+					exist = true;
+					break;
+				}
+			}
+			
+			if(exist) {
+				Main.write(ANSI.LIGHTYELLOW + "+=====   ESSE JOGADOR JÁ EXISTE   =====+" + ANSI.RESET);
+				i--;
+			}
+			
+			if(!in.contains("ok") && !exist)
 				jogadores.add(new Jogador(in));
 		}
 		Main.write(ANSI.LIGHTYELLOW + "+=======================================+" + ANSI.RESET);
 	}
 	
 	public void desistir(Jogador jogador) {
-		Main.write(ANSI.PURPLE + "$$$ " + jogador.getNome() + " FALIU $$$" + ANSI.RESET);
+		Main.write(ANSI.LIGHTRED + "\n|----------------------------------------------|" + ANSI.RESET);
+		Main.write(ANSI.RED +      "              " + jogador.getNome().toUpperCase() + " FALIU" + ANSI.RESET);
+		Main.write(ANSI.LIGHTRED + "|----------------------------------------------|" + ANSI.RESET);
 		jogador.setStatus(StatusJogador.FALIDO);
 	}
-
+	
+	public void mostrarPosicao(Jogador jogador, int n){
+		Main.write(ANSI.LIGHTBLUE + "-------------------------------------------------------------------" + ANSI.RESET);
+		Main.write(ANSI.LIGHTCYAN + " " + Propriedades.getPropriedade(jogador.getPosicao()).getLabel() + " -> " 
+					+ Propriedades.getPropriedade((jogador.getPosicao() + n) % 40).getLabel() + " | "
+					+ "SALDO: R$ " + Main.format(jogador.getSaldo()));
+		Main.write(ANSI.LIGHTBLUE + "-------------------------------------------------------------------" + ANSI.RESET);
+	}
 }

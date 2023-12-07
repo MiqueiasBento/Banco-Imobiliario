@@ -10,7 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class Board extends JFrame {
-
+//	public static final long serialVersionUID = 1L;
+	
 	private JPanel contentPane;
 
 	/**

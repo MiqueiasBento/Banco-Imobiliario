@@ -1,7 +1,6 @@
 package principal_class;
 
 import Controls.Main;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,6 +10,7 @@ import enums.ANSI;
 import enums.StatusJogador;
 
 public class BancoImobiliario {
+//	public static final long serialVersionUID = 1L;
 	private Jogador winner;
 	private Tabuleiro board;
 	private int rDados;
@@ -25,8 +25,8 @@ public class BancoImobiliario {
 	public void jogar(Jogador jogador) {
 		int d1 = jogada();
 		int d2 = jogada();
-//		int d1 = 3;
-//		int d2 = 3;
+//		int d1 = 30;
+//		int d2 = 0;
 		
 		mostrarDados(d1, d2);
 		
@@ -98,8 +98,9 @@ public class BancoImobiliario {
 		if (playersLose == board.getJogadores().size() - 1) {
 			for (Jogador j : board.getJogadores()) {
 				if (j.getStatus() != StatusJogador.FALIDO) {
-					winner = j;
-					Main.write(j.getNome().toUpperCase() + " VENCEU !!!!!!!!");
+					Main.write(ANSI.LIGHTGREEN + "\n|----------------------------------------------|" + ANSI.RESET);
+					Main.write(ANSI.GREEN +      "              " + j.getNome().toUpperCase() + " VENCEU!" + ANSI.RESET);
+					Main.write(ANSI.LIGHTGREEN + "|----------------------------------------------|" + ANSI.RESET);
 					return true;
 				}
 			}
@@ -118,13 +119,14 @@ public class BancoImobiliario {
 
 			if (r.getProprietario() == null) {
 				// Se estiver sem proprietario, pode ser comprada pelo jogador que está na posicao
-				Main.write("Saldo: R$ " + Main.format(jogador.getSaldo()));
-				Main.write(r.getPropriedade());
-				Main.print("\nDeseja comprar? (sim / nao) ");
+				Main.write(ANSI.LIGHTYELLOW + r.getPropriedade() + ANSI.RESET);
+				Main.print(ANSI.BOLD + "Deseja comprar? (Y / n) " + ANSI.RESET);
 				String response = Main.input();
 
-				if (response.equals("sim")) {
-					if(jogador.getSaldo() - r.getValorPropriedade() < 0) throw new Exception("Saldo insuficiente");
+				if (response.contains("y") || response.contains("s")) {
+					if(jogador.getSaldo() - r.getValorPropriedade() < 0) {
+						throw new Exception("Saldo insuficiente");
+					}
 					
 					jogador.comprarPropriedade(r);
 				} else {
@@ -145,17 +147,15 @@ public class BancoImobiliario {
 
 			if (c.getProprietario() == null) {
 				// Se estiver sem proprietario, pode ser comprada pelo jogador que está na posicao
-				Main.write("Saldo: R$ " + Main.format(jogador.getSaldo()));
-				Main.write(c.getPropriedade());
-				Main.print("\nDeseja comprar? (sim / nao) ");
+				Main.write(ANSI.LIGHTYELLOW + c.getPropriedade() + ANSI.RESET);
+				Main.print(ANSI.BOLD + "- Deseja comprar? (Y / n) " + ANSI.RESET);
 
 				String response = Main.input();
-				if (response.equals("sim")) {
-					if (response.equals("sim")) {
-						if(jogador.getSaldo() - c.getValorPropriedade() < 0) throw new Exception("Saldo insuficiente");
+				if (response.contains("y") || response.contains("s")) {
+					if(jogador.getSaldo() - c.getValorPropriedade() < 0) 
+						throw new Exception("OPS! SALDO INSUFICIENTE");
 						
-						jogador.comprarPropriedade(c);
-					}
+					jogador.comprarPropriedade(c);
 				} else {
 					return;
 				}
@@ -176,17 +176,14 @@ public class BancoImobiliario {
 				Prisao.entrar(jogador);
 			} else if(p.getId() == 11 || p.getId() == 21) {
 				// Posicao da detenção e férias, então não acontece nada
-				Main.write("--- " + p.getLabel() + " ---");
 				return;
 			} else if(p.getId() == 25) {
 				// Posicao da Receita Federal, o jogador perde 200k
-				Main.write("Tok Tok...");
-				Main.write("Receita Federal, pague seus impostos: R$ 200.000,00");
+				Main.write(ANSI.BOLD + "Tok Tok...\nReceita Federal, pague seus impostos: R$ 200.000,00" + ANSI.RESET);
 				jogador.setSaldo(jogador.getSaldo() - 200000);
 			} else if(p.getId() == 38) {
 				// Posicao da Loteria, o jogador ganha 200k
-				Main.write("Hurruh");
-				Main.write("Parabéns! Você ganhou na loteria, receba: R$ 200.000,00");
+				Main.write(ANSI.BOLD + "Hurruh\nParabéns! Você ganhou na loteria, receba: R$ 200.000,00" + ANSI.RESET);
 				jogador.setSaldo(jogador.getSaldo() - 200000);
 			}
 		}
@@ -216,26 +213,30 @@ public class BancoImobiliario {
 			return;
 		}
 		
-		Main.write(ANSI.RED + "\n- - - SEU SALDO ESTÁ NEGATIVO - - -" + ANSI.RESET);
-		while(jogador.getSaldo() < 0) {
-			Main.write("==================================+");
-			Main.write("1 - NEGOCIAR                      |");
-			Main.write("2 - HIPOTECAR                     |");
-			Main.write("3 - DESISTIR                      |");
-			Main.write("==================================+");
-			Main.print("-> ");
-			String response = Main.sc.nextLine();
+		if(jogador.getSaldo() < 0 && jogador.getStatus() != StatusJogador.FALIDO) {
+			Main.write(ANSI.LIGHTRED + "+----------------------------------------------------------------+" + ANSI.RESET);
+			Main.write(ANSI.RED + "               - - - SEU SALDO ESTÁ NEGATIVO - - -" + ANSI.RESET);
+			Main.write(ANSI.RED + "                       R$ " + Main.format(jogador.getSaldo()) + ANSI.RESET);
 			
-			if(response.contains("1")) {
-				this.administracao(jogador, "NEGOCIAR");
-			} else if(response.contains("2")) {
-				this.administracao(jogador, "HIPOTECAR");
-			} else if(response.contains("3")) {
-				board.desistir(jogador);
-				return;
+			while(jogador.getSaldo() < 0) {
+				Main.write("==================================+");
+				Main.write("1 - NEGOCIAR                      |");
+				Main.write("2 - HIPOTECAR                     |");
+				Main.write("3 - DESISTIR                      |");
+				Main.write("==================================+");
+				Main.print("-> ");
+				String response = Main.sc.nextLine();
+				
+				if(response.contains("1")) {
+					this.administracao(jogador, "NEGOCIAR");
+				} else if(response.contains("2")) {
+					this.administracao(jogador, "HIPOTECAR");
+				} else if(response.contains("3")) {
+					board.desistir(jogador);
+					return;
+				}
 			}
 		}
-		
 	}
 	
 	// Sorteio um dado de seis faces (1 a 6)

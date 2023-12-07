@@ -1,6 +1,6 @@
 package enums;
 
-public enum StatusJogador {
+public enum StatusJogador{
 	LIVRE,
 	PRESO,
 	FALIDO;
@@ -9,11 +9,11 @@ public enum StatusJogador {
 	public String toString() {
 		switch(this) {
 			case LIVRE:
-				return "Livre";
+				return "LIVRE";
 			case PRESO:
-				return "Preso";
+				return "PRESO";
 			case FALIDO:
-				return "Falido kkk";
+				return "FALIDO";
 			default:
 				return "sem status";
 		}

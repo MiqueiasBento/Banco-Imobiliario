@@ -1,6 +1,7 @@
 package Controls;
 
 import java.text.NumberFormat;
+import java.io.*;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -8,12 +9,30 @@ import enums.ANSI;
 import principal_class.*;
 
 public class Main {
+	public static BancoImobiliario BI = new BancoImobiliario();
+	public static Scanner scanner = new Scanner(System.in);
+	
 	public static void main(String args[]) {
-		BancoImobiliario BI = new BancoImobiliario();
-		
-		// Adiciona de 2 a 6 players
-		BI.chamaAddPlayers();;
+//		File file = new File("BI.save");
+//		if(file.exists()) {
+//			char choice;
+//			Main.write("Um jogo foi encontrado. Deseja carregar? (S/n)");
+//			choice = scanner.nextLine().charAt(0);
+//			
+//			if(choice != 'n') 
+//				try {
+//					load();
+//				} catch(Exception e) {
+//					e.printStackTrace();
+//				}
+//			else BI.chamaAddPlayers();;
+			
+//		} else {
+//			// Adiciona de 2 a 6 players
+//			BI.chamaAddPlayers();;
+//		}
 
+		BI.chamaAddPlayers();;
 		// Looping até ter um vencedor
 		while (!BI.winner()) {
 
@@ -22,7 +41,7 @@ public class Main {
 
 				// Pode administrar e negociar quantas vezes quiser, mas só passa para o próximo
 				// player quando jogar os dados
-				write(ANSI.LIGHTGREEN + "__________________________________________________________________________" + ANSI.RESET);
+				write(ANSI.BOLD + "__________________________________________________________________________" + ANSI.RESET);
 				write("PLAYER: " + ANSI.LIGHTGREEN + jog.getNome() + ANSI.RESET);
 
 				String in;
@@ -53,12 +72,25 @@ public class Main {
 					} else if (in.contains("5")) {
 						// Mostra o status do jogador atual
 						write(jog);
+					} else if (in.contains("0")) {
+						// Mostra o status do jogador atual
+						write(ANSI.LIGHTRED + "\n ---      JOGO ENCERRADO      --- " + ANSI.RESET);
+//						write(" --- DESEJA SALVAR? (S/n) --- ");
+//						char choice;
+//						choice = scanner.nextLine().charAt(0);
+						
+//						if(choice != 'n') 
+//							try {
+//								save();
+//							} catch(Exception e) {
+//								e.printStackTrace();
+//							}
+						
+						return;
 					} else {
-						print(ANSI.LIGHTYELLOW + "Tente novamente" + ANSI.RESET);
+						print(ANSI.BOLD + "\nTente novamente" + ANSI.RESET);
 					}
-					write(ANSI.LIGHTGREEN + "\n--------------------------------------------------------------------------" + ANSI.RESET);
-					
-					sc.nextLine();		// Limpar o buffer
+					write(ANSI.BOLD + "\n--------------------------------------------------------------------------" + ANSI.RESET);
 					
 					if (BI.winner()) {
 						return;
@@ -94,13 +126,26 @@ public class Main {
 		return NumberFormat.getNumberInstance(ptBr).format(numero) + ",00";
 	}
 
+	public static void save() throws IOException, ClassNotFoundException {
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("BI.save"));
+		out.writeObject(BI);
+		out.close();
+	}
+	
+	public static void load() throws IOException, ClassNotFoundException {
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream("BI.save"));
+		BI = (BancoImobiliario) in.readObject();
+		in.close();
+	}
+	
 	public static void opcoes() {
-		write("===========================+");
-		write("1 - JOGAR DADOS            |");
-		write("2 - ADMINISTRAR            |");
-		write("3 - NEGOCIAR               |");
-		write("4 - HIPOTECAR              |");
-		write("5 - VER STATUS             |");
-		write("===========================+");
+		write("+=======================================+");
+		write("|1 - JOGAR DADOS                        |");
+		write("|2 - COMPRAR IMÓVEIS                    |");
+		write("|3 - NEGOCIAR                           |");
+		write("|4 - HIPOTECAR                          |");
+		write("|5 - VER STATUS                         |");
+		write("|" + ANSI.LIGHTRED + "0 - ENCERRAR JOGO" + ANSI.RESET + "                      |");
+		write("+=======================================+");
 	}
 }

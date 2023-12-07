@@ -32,9 +32,13 @@ public class Rua extends Propriedade implements PropriedadeAlocavel {
 	}
 
 	public String getPropriedade() {
-		return super.toString() + ": " + this.cor + " - " + this.status + "\n" + "VALOR DA PROPRIEDADE: R$ "
-				+ Main.format(this.valorPropriedade) + "\n" + "VALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase)
-				+ "\n" + "VALOR DO IMÓVEL: R$ " + Main.format(this.valorImovel);
+		String out = "+-----------------------------------------------------------------+\n"
+				+ super.toString() + " - " + this.status + " + " + this.cor
+				+ "\nVALOR DA PROPRIEDADE: R$ " + Main.format(this.valorPropriedade) 
+				+ "\nVALOR DO ALUGUEL: R$ " + Main.format(this.aluguelBase)
+				+ "\nVALOR DO IMÓVEL: R$ " + Main.format(this.valorImovel);
+		       out += "\n+-----------------------------------------------------------------+\n";
+		return out;
 	}
 
 	public String previaPropriedade() {

@@ -8,7 +8,8 @@ import enums.corProp;
 import principal_class.*;
 import properties.*;
 
-public class Propriedades {
+public class Propriedades{
+//	public static final long serialVersionUID = 1L;
 	private static TreeMap<Integer, Propriedade> propriedades = new TreeMap<>();
 	
 	static {
@@ -124,16 +125,16 @@ public class Propriedades {
 	
 	
 	
-	@ Override
-	public String toString() {
-		String out = "";
-		
-		for(Propriedade p : propriedades.values()) {
-			out += p + "\n";
-		}
-		
-		return out;
-	}
+//	@ Override
+//	public String toString() {
+//		String out = "";
+//		
+//		for(Propriedade p : propriedades.values()) {
+//			out += p + "\n";
+//		}
+//		
+//		return out;
+//	}
 	
 //	public String toString() {
 //		String out = "";

@@ -23,9 +23,11 @@ public class Companhia extends Propriedade implements PropriedadeAlocavel{
 	}
 	
 	public String getPropriedade() {
-		String out = super.toString() + " - " + this.status + "\n"
+		String out = "+-----------------------------------------------------------------+\n"
+				+ super.toString() + " - " + this.status + "\n"
 				+ "VALOR DA COMPANHIA: R$ " + Main.format(this.valorCompanhia) + "\n"
 				+ "ALUGUEL BASE: R$ " + Main.format(this.aluguelBase);
+			   out += "\n+-----------------------------------------------------------------+\n";
 		
 		return out;
 	}
