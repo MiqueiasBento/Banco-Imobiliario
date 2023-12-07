@@ -236,6 +236,8 @@ public class BancoImobiliario {
 					return;
 				}
 			}
+		} else {
+			return;
 		}
 	}
 	
