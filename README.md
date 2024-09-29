@@ -1,5 +1,6 @@
 ## Banco Imobiliário  
 Banco Imobiliário é um jogo de tabuleiro para 2 a 6 jogadores, no qual os participantes compram, vendem e alugam propriedades para se tornarem o magnata imobiliário mais rico. O jogo foi criado em 1903 por Lizzie Magie, que o batizou de The Landlord's Game. O jogo foi posteriormente modificado e lançado por Charles Darrow em 1933, e desde então se tornou um dos jogos de tabuleiro mais populares do mundo.  
+Esse projeto consiste em recriar o jogo para o projeto final da cadeira de **Programação Orientada a Objetos** (POO) - *2023.2*.
   
 ## Regras  
   
